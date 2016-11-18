@@ -5,7 +5,7 @@ function[] = performMigrationAnalysis(expPath,PLOTMORE)
 % 05.2015 Tim Becker 
 
 if ~exist('PLOTMORE','var')
-    PLOTMORE = 1;
+    PLOTMORE = 0;
 end
 
 %% load stored tracking results 
@@ -32,7 +32,7 @@ for i=1:length(validPaths)
    else
        plot(trajectories{i}(:,2),trajectories{i}(:,1),'r');
    end
-    drawnow
+    %drawnow
 end
 grid on;
 axis equal
@@ -79,7 +79,16 @@ M = mean(M) /length(validPaths);
 pathLength = [pm{validPaths,2}]- [pm{validPaths,1}] +1;
 
 saveName = [expPath filesep 'results' filesep 'migrationDataValidPaths.mat'];
-save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle','pathLength');
+
+
+
+[fractionValidObservationTime, validObservationTime, totalObservationTime] = getValidObservationTime(pm);
+[turningLeft, turningRight] = performSectorAnalysis(tLng,pm,validPaths,1);
+
+percentageLeft = length(turningLeft) / length(validPaths); 
+percentageRight = length(turningRight) / length(validPaths);
+
+save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle','pathLength','fractionValidObservationTime','percentageLeft','percentageRight');
 
 csvHeader = {'pathlength','velocity','x-fmi','y-fmi','directionality','angle'};
 

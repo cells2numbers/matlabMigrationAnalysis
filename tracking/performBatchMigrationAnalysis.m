@@ -57,7 +57,7 @@ if 1
     indexAnalyzed = find(exp.analyzed);
     fprintf('\n');
     fprintf('-----------------------------------------------------------\n');
-    fprintf('paths \t valid \t ratio \t X-FMI \t Y-FMI \t D \t filename \n');
+    fprintf('paths \t valid \t ratio \t X-FMI \t Y-FMI \t velo \t D \t VOT \t left \t right \t filename \n');
     fprintf('-----------------------------------------------------------\n');
     for i=1:length(indexAnalyzed)
         iExp = indexAnalyzed(i);
@@ -71,12 +71,23 @@ if 1
         yfmi(i) = FMI(2);
         meanVelocity(i) = mean(velocity);
         d(i) = sum(D)/length(D);
-        fprintf('%i \t  %i \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t%1.2f \t %s \n',...
-            nPaths(i),nValidPaths(i),nValidPaths(i)/nPaths(i),xfmi(i),yfmi(i),meanVelocity(i),d(i),fileList{i});
+        turnLeft(i) = percentageLeft;
+        turnRight(i) = percentageRight;
+        validObservationTime(i) = fractionValidObservationTime;
+        
+        fprintf('%i \t  %i \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %2.2f \t %2.2f \t %2.2f \t %s \n',...
+            nPaths(i),nValidPaths(i),nValidPaths(i)/nPaths(i),xfmi(i),yfmi(i),meanVelocity(i),d(i), validObservationTime(i),turnLeft(i), turnRight(i), fileList{i});
     end
 end
     
- migrationData = [nPaths',nValidPaths',nValidPaths'./nPaths',xfmi',yfmi',meanVelocity',d'];
+ migrationData = [nPaths',nValidPaths',nValidPaths'./nPaths',xfmi',yfmi',...
+                  meanVelocity',d',validObservationTime',turnLeft',turnRight'];
+              
+ csvHeader = {'number of paths', 'valid paths', 'perc. of valid paths',...
+              'xfmi','yfmi','mean velocity','directionality',...
+              'valid observation time','perc. turning left',...
+              'perc. turning right'};
  
  save([expPath filesep 'migrationData.mat'],'migrationData','fileList','pathList');
+ csvwrite_with_headers([expPath filesep 'migrationData.csv'],migrationData,csvHeader );
 

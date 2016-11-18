@@ -303,7 +303,8 @@ function pushbutton_batch_tracking_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 expPath = uigetdir();
-performBatchTracking(expPath)
+OVERWRITE = 1;
+performBatchTracking(expPath,OVERWRITE)
 
 
 % --- Executes on button press in pushbutton_batch_analyse.
@@ -313,7 +314,12 @@ function pushbutton_batch_analyse_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 expPath = uigetdir();
-performBatchMigrationAnalysis(expPath)
+if isequal(expPath,0)
+   warning('No directory loaded! Please select valid dir'); 
+else
+    performBatchMigrationAnalysis(expPath)
+end
+    
 
 
 % --- Executes on button press in pushbutton_publish_analysis.

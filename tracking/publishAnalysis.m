@@ -28,13 +28,13 @@ for i=1:length(validPaths)
    else
        plot(trajectories{i}(:,2),trajectories{i}(:,1),'r');
    end
-    drawnow
+   %drawnow
 end
 grid on;
 axis equal
 title('Trajektorien');    
 
-% aangle distribution of the direction of movement 
+% angle distribution of the direction of movement 
 a = zeros(size(validPaths));
 for i=1:length(validPaths)
    a(i) = atan2(trajectories{i}(end,1),trajectories{i}(end,2));
@@ -72,6 +72,17 @@ fprintf('y-fmi: %3.3f \n',FMI(2));
 fprintf('velocity (in px/frame): %3.3f \n',dist_accum / length(dist));
 fprintf('distance traveled (accumulated distance): %3.3f \n',dist_accum);
 
+
+[fraction, validObservationTime, totalObservationTime] = getValidObservationTime(pm);
+fprintf('totalObservationTime (cummulative) : %5.3f \n',totalObservationTime);
+fprintf('validObservationTime (cummulative) : %5.3f \n',validObservationTime);
+fprintf('percentage of valid observation time: %2.2f \n',fraction);
+
+
+[turningLeft, turningRight] = performSectorAnalysis(tLng,pm,validPaths,1);
+fprintf('percentage turning left: %1.2f \n', length(turningLeft) / length(validPaths) );
+
+fprintf('percentage turning right: %1.2f \n', length(turningRight) / length(validPaths) );
 
 %M = mean(M) /length(validPaths);
 %saveName = [expPath filesep 'results' filesep 'migrationData.mat'];
