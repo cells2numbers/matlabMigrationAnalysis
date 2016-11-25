@@ -1,7 +1,13 @@
 function [] = performBatchMigrationAnalysis(expPath,OVERWRITE)
+%
+%
+%
+%
+% 
+
 
 if ~exist('OVERWRITE','var')
-    OVERWRITE = 0; 
+    OVERWRITE = 1; 
 end
 
 filename = 'expInfo.mat';
@@ -75,7 +81,7 @@ if 1
         turnRight(i) = percentageRight;
         validObservationTime(i) = fractionValidObservationTime;
         
-        fprintf('%i \t  %i \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %2.2f \t %2.2f \t %2.2f \t %s \n',...
+        fprintf('%i \t  %i \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %3.2f \t %3.2f \t %3.2f \t %s \n',...
             nPaths(i),nValidPaths(i),nValidPaths(i)/nPaths(i),xfmi(i),yfmi(i),meanVelocity(i),d(i), validObservationTime(i),turnLeft(i), turnRight(i), fileList{i});
     end
 end
@@ -86,8 +92,19 @@ end
  csvHeader = {'number of paths', 'valid paths', 'perc. of valid paths',...
               'xfmi','yfmi','mean velocity','directionality',...
               'valid observation time','perc. turning left',...
-              'perc. turning right'};
+              'perc. turning right','experiment'};
  
- save([expPath filesep 'migrationData.mat'],'migrationData','fileList','pathList');
- csvwrite_with_headers([expPath filesep 'migrationData.csv'],migrationData,csvHeader );
+ save([expPath filesep 'migrationData.mat'],'migrationData','fileList','pathList','csvHeader');
+ %csvwrite_with_headers([expPath filesep 'migrationData.csv'],migrationData,csvHeader );
+
+ % export to csv
+ fid = fopen([expPath filesep 'migrationData.csv'],'w');
+ for i=1:length(csvHeader)
+     fprintf(fid,'%s,',csvHeader{i});
+ end
+ fprintf(fid,'\n');
+ for i=1:size(migrationData,1)
+     [~,iPath] =  fileparts(pathList{i});
+     fprintf(fid,'%i, %i, %2.4f, %f2.4, %f2.4, %f2.4, %2.4f, %2.4f, %2.4f, %2.4f,  %s \n',migrationData(i,:),iPath);
+ end
 

@@ -88,7 +88,7 @@ end
 
 if isempty(fm)
     % in this case, we set a path valid, if it has the correct length
-    for iPath=1:length(pm)
+    for iPath=1:size(pm,1)
         if ~isempty(pm{iPath,1})  % we check if we have an deltetd path
             LENGTHOK =  pm{iPath,2} - pm{iPath,1} > validLength;
             if LENGTHOK
@@ -114,7 +114,7 @@ else % now we also check for the min threshold in the path
     end
     
     % same loop as above, we only add the feature-thing ;) 
-    for iPath=1:length(pm)
+    for iPath=1:size(pm,1)
         if ~isempty(pm{iPath,1})
             LENGTHOK =  pm{iPath,2} - pm{iPath,1} > validLength;
             if LENGTHOK 

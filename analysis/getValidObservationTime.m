@@ -24,6 +24,6 @@ totalObservationTime = sum(pathLength);
 validPaths = getValidPath(pm);
 validObservationTime = sum(pathLength(validPaths));
 
-fraction = validObservationTime / totalObservationTime;
+fraction = 100*validObservationTime / totalObservationTime;
 end
 

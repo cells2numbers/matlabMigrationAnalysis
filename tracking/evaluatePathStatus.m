@@ -36,7 +36,7 @@ pathList = zeros(length(pm),1);
 timeList = zeros(length(pm),1);
 
 % we count all mitosis ()
-for iPath=1:length(pm)
+for iPath=1:size(pm,1)
     % get the status
     if ~isempty(pm{iPath,1})
         [newStatus,FLAG] = getPathStatus(pm,iPath,statusflag);
