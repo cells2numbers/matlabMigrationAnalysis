@@ -1,4 +1,14 @@
 function [] = performPublishAnalysis(expPath)
+% publish analysis of tracking experiments
+%
+% Function to recursively publish all tracked migration experiments
+% in an given path. 
+%
+% Input
+%   expPath      Folder storing all experiment data
+%   
+%
+%
 
 filename = 'expInfo.mat';
 [fileList,pathList] = searchFileRec(expPath,filename);

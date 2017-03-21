@@ -1,7 +1,13 @@
 function [] = performBatchMigrationAnalysis(expPath,OVERWRITE)
+%
+%
+%
+%
+% 
+
 
 if ~exist('OVERWRITE','var')
-    OVERWRITE = 0; 
+    OVERWRITE = 1; 
 end
 
 filename = 'expInfo.mat';
@@ -36,12 +42,12 @@ end
 
 
 parfor i=1:length(index2analyze)
-    fprintf('---------------------------------------------------\n');
-    fprintf('analyzing image series %i of the last missing %i \n',i,length(index2analyze));
+    %fprintf('---------------------------------------------------\n');
+    fprintf('analyzing series %i / %i ',i,length(index2analyze));
     iExp = index2analyze(i);
     performMigrationAnalysis(pathList{iExp});
-    fprintf('finished image series %i of the last missing %i \n',i,length(index2analyze));
-    fprintf('---------------------------------------------------\n\n');
+    fprintf('  finished!\n');
+    %fprintf('---------------------------------------------------\n\n');
 end
 
 % update index of analyzed files 
@@ -57,7 +63,7 @@ if 1
     indexAnalyzed = find(exp.analyzed);
     fprintf('\n');
     fprintf('-----------------------------------------------------------\n');
-    fprintf('paths \t valid \t ratio \t X-FMI \t Y-FMI \t D \t filename \n');
+    fprintf('paths \t valid \t ratio \t X-FMI \t Y-FMI \t velo \t D \t VOT \t left \t right \t filename \n');
     fprintf('-----------------------------------------------------------\n');
     for i=1:length(indexAnalyzed)
         iExp = indexAnalyzed(i);
@@ -71,12 +77,51 @@ if 1
         yfmi(i) = FMI(2);
         meanVelocity(i) = mean(velocity);
         d(i) = sum(D)/length(D);
-        fprintf('%i \t  %i \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t%1.2f \t %s \n',...
-            nPaths(i),nValidPaths(i),nValidPaths(i)/nPaths(i),xfmi(i),yfmi(i),meanVelocity(i),d(i),fileList{i});
+        turnLeft(i) = percentageLeft;
+        turnRight(i) = percentageRight;
+        
+        distanceLeft(i) = mean(distLeft);
+        distanceLeftAccu(i) = mean(distALeft); 
+        distanceRight(i) = mean(distRight);
+        distanceRightAccu(i) = mean(distARight);
+        validObservationTime(i) = fractionValidObservationTime;
+        meanVelocityLeft(i) = mean(velocityLeft);
+        meanVelocityRight(i) = mean(velocityRight);
+        meanVelocityNeutral(i) = mean(velocityNeutral);
+        meanDLeft(i) = mean(DLeft);
+        meanDRight(i) = mean(DRight);
+        [p,n,e] = fileparts(fileList{i});
+        filesepPosition = strfind(p,filesep);
+        
+        fprintf('%i \t  %i \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %1.2f \t %3.2f \t %3.2f \t %3.2f \t %s \n',...
+            nPaths(i),nValidPaths(i),nValidPaths(i)/nPaths(i),xfmi(i),yfmi(i),meanVelocity(i),d(i), validObservationTime(i),turnLeft(i), turnRight(i), p((filesepPosition(end-2)+1):end));
     end
 end
     
- migrationData = [nPaths',nValidPaths',nValidPaths'./nPaths',xfmi',yfmi',meanVelocity',d'];
+ migrationData = [nPaths',nValidPaths',nValidPaths'./nPaths',xfmi',yfmi',...
+                  meanVelocity',d',validObservationTime',turnLeft',turnRight',...
+                  distanceLeft',distanceLeftAccu',distanceRight',distanceRightAccu',meanVelocityLeft',meanVelocityRight',meanVelocityNeutral',meanDLeft',meanDRight'];
+              
+ csvHeader = {'number of paths', 'valid paths', 'perc. of valid paths',...
+              'xfmi','yfmi','mean velocity','directionality',...
+              'valid observation time','perc. turning left',...
+              'perc. turning right','dist left', 'ac. dist left','dist right','ac. dist right','velocity left','velocity right','velocity neutral','DLeft','DRight'};
  
- save([expPath filesep 'migrationData.mat'],'migrationData','fileList','pathList');
+ save([expPath filesep 'migrationData.mat'],'migrationData','fileList','pathList','csvHeader');
+ %csvwrite_with_headers([expPath filesep 'migrationData.csv'],migrationData,csvHeader );
+%%
+ % export to csv
+ fid = fopen([expPath filesep 'migrationData.csv'],'w');
+ for i=1:length(csvHeader)
+     fprintf(fid,'%s,',csvHeader{i});
+ end
+ 
+ fprintf(fid,'\n');
+ %%
+ for i=1:size(migrationData,1)
+     [p,n,e] = fileparts(fileList{i});
+     filesepPosition = strfind(p,filesep);
+     expPathString = p((filesepPosition(end-2)+1):end);
+     fprintf(fid,'%i, %i, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e,%2.4e, %2.4e, %2.4e, %2.4e, %2.4e,  %s \n',migrationData(i,:),expPathString);
+ end
 

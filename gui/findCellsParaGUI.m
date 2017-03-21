@@ -27,7 +27,7 @@ function varargout = findCellsParaGUI(varargin)
 
 % Edit the above text to modify the response to help findCellsParaGUI
 
-% Last Modified by GUIDE v2.5 12-May-2015 12:46:34
+% Last Modified by GUIDE v2.5 24-Nov-2016 20:23:45
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -974,3 +974,10 @@ function figure1_ResizeFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes during object creation, after setting all properties.
+function figure1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called

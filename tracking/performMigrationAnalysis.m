@@ -5,7 +5,7 @@ function[] = performMigrationAnalysis(expPath,PLOTMORE)
 % 05.2015 Tim Becker 
 
 if ~exist('PLOTMORE','var')
-    PLOTMORE = 1;
+    PLOTMORE = 0;
 end
 
 %% load stored tracking results 
@@ -32,7 +32,7 @@ for i=1:length(validPaths)
    else
        plot(trajectories{i}(:,2),trajectories{i}(:,1),'r');
    end
-    drawnow
+    %drawnow
 end
 grid on;
 axis equal
@@ -79,14 +79,60 @@ M = mean(M) /length(validPaths);
 pathLength = [pm{validPaths,2}]- [pm{validPaths,1}] +1;
 
 saveName = [expPath filesep 'results' filesep 'migrationDataValidPaths.mat'];
-save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle','pathLength');
 
-csvHeader = {'pathlength','velocity','x-fmi','y-fmi','directionality','angle'};
+% 
+[fractionValidObservationTime, validObservationTime, totalObservationTime] = getValidObservationTime(pm);
+[turningLeft, turningRight] = performSectorAnalysis(tLng,pm,validPaths,1);
 
-saveNameCSV = [expPath filesep 'results' filesep 'migrationDataValidPaths.csv'];
+velocityLeft = zeros(size(turningLeft));
+DLeft = zeros(size(turningLeft));
+for i = 1:length(turningLeft)
+    velocityLeft(i) = velocity( find(validPaths == turningLeft(i)));
+    DLeft(i) = D( find(validPaths == turningLeft(i)));
+end
+
+velocityRight = zeros(size(turningRight));
+DRight = zeros(size(turningRight));
+for i = 1:length(turningRight)
+    velocityRight(i) = velocity( find(validPaths == turningRight(i)));
+    DRight(i) = D( find(validPaths == turningRight(i)));
+end
+
+turningNeutral = setdiff(validPaths,[turningLeft,turningRight]);
+
+velocityNeutral = zeros(size(turningNeutral));
+%D = zeros(size(turningNeutral));
+if ~isempty(turningNeutral)
+    for i = 1:length(turningNeutral)
+        velocityNeutral(i) = velocity(find(validPaths == turningNeutral(i)));
+        %    D(i) = D(find(validPaths == turningNeutral(i)));
+    end
+end
+
+percentageLeft = length(turningLeft) / length(validPaths); 
+percentageRight = length(turningRight) / length(validPaths);
+
+[distLeft, distALeft] = getDistanceTravelled(tLng,pm,turningLeft);
+[distRight, distARight] = getDistanceTravelled(tLng,pm,turningRight);
+
+% save as mat file 
+save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle',...
+    'pathLength','fractionValidObservationTime','percentageLeft','percentageRight',...
+    'distLeft','distALeft','distRight','distARight','velocityLeft','velocityRight',...
+    'turningLeft','turningRight','turningNeutral','velocityNeutral','DLeft','DRight');
+
+
+% save all parameters for each trajectory as csv 
+saveNameCSV1 = [expPath filesep 'results' filesep 'migrationDataValidPaths.csv'];
 migrationDataMatrix = [pathLength',velocity',X_FMI',Y_FMI',D',trajectoryAngle'];
+csvHeader1 = {'pathlength','velocity','x-fmi','y-fmi','directionality','angle'};
+csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,csvHeader1);
 
-csvwrite_with_headers(saveNameCSV,migrationDataMatrix,csvHeader);
+% save all parameters describing the complete experiment as separate csv
+saveNameCSV2 = [expPath filesep 'results' filesep 'migrationDataExperiment.csv'];
+migrationDataExperiment = [percentageLeft, percentageRight, fractionValidObservationTime];
+csvHeader2 = {'percentageLeft','percentageRight','fractionValidObservationTime'};
+csvwrite_with_headers(saveNameCSV2,migrationDataExperiment,csvHeader2);
 
 if PLOTMORE
     
