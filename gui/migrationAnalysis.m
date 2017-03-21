@@ -306,8 +306,12 @@ function pushbutton_batch_tracking_Callback(hObject, eventdata, handles)
 
 expPath = uigetdir();
 OVERWRITE = 0;
-performBatchTracking(expPath,OVERWRITE)
 
+if isequal(expPath,0)
+    warning('no path selected, aborting');
+else
+    performBatchTracking(expPath,OVERWRITE)
+end
 
 % --- Executes on button press in pushbutton_batch_analyse.
 function pushbutton_batch_analyse_Callback(hObject, eventdata, handles)
