@@ -1,4 +1,4 @@
-function[turningLeft, turningRight] = performSectorAnalysis(tLng,pm,pathList,PLOT)
+function[turningLeft, turningRight,idLeft,idRight] = performSectorAnalysis(tLng,pm,pathList,PLOT)
 %
 %
 %
@@ -30,14 +30,17 @@ end
 
 
 turningLeft  = [find(a> 3*pi/4), find(a<-3*pi/4)];
-turningRight = intersect( find(a < pi/4), find(a>-pi/4));
+turningRight = intersect( find(a < pi/4), find( a > -pi/4));
 
 turningUpDown = setdiff(1:length(a), intersect(turningLeft,turningRight));
+
+
+
+
 
 if PLOT
     %%
     h = figure();
-    hold on;
     for i=1:length(turningUpDown)
         iPath = turningUpDown(i);
         plot(trajectories{iPath}(:,2),trajectories{iPath}(:,1),'k');
@@ -54,3 +57,6 @@ if PLOT
     axis equal;
     
 end
+
+turningLeft = pathList(turningLeft);
+turningRight = pathList(turningRight);

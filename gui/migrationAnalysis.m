@@ -171,7 +171,9 @@ function pushbutton_load_experiment_Callback(hObject, eventdata, handles)
 
 experiment_path = uigetdir();
 set(handles.pushbutton_load_experiment,'UserData',experiment_path);
-cd(experiment_path);
+if ~isempty(experiment_path)
+    cd(experiment_path);
+end
 
 update_migrationAnalysis(handles);
 
@@ -303,7 +305,7 @@ function pushbutton_batch_tracking_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 expPath = uigetdir();
-OVERWRITE = 1;
+OVERWRITE = 0;
 performBatchTracking(expPath,OVERWRITE)
 
 
@@ -313,11 +315,13 @@ function pushbutton_batch_analyse_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+OVERWRITE = 1
+
 expPath = uigetdir();
 if isequal(expPath,0)
    warning('No directory loaded! Please select valid dir'); 
 else
-    performBatchMigrationAnalysis(expPath)
+    performBatchMigrationAnalysis(expPath,OVERWRITE)
 end
     
 

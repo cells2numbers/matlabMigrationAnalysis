@@ -84,11 +84,42 @@ saveName = [expPath filesep 'results' filesep 'migrationDataValidPaths.mat'];
 [fractionValidObservationTime, validObservationTime, totalObservationTime] = getValidObservationTime(pm);
 [turningLeft, turningRight] = performSectorAnalysis(tLng,pm,validPaths,1);
 
+velocityLeft = zeros(size(turningLeft));
+DLeft = zeros(size(turningLeft));
+for i = 1:length(turningLeft)
+    velocityLeft(i) = velocity( find(validPaths == turningLeft(i)));
+    DLeft(i) = D( find(validPaths == turningLeft(i)));
+end
+
+velocityRight = zeros(size(turningRight));
+DRight = zeros(size(turningRight));
+for i = 1:length(turningRight)
+    velocityRight(i) = velocity( find(validPaths == turningRight(i)));
+    DRight(i) = D( find(validPaths == turningRight(i)));
+end
+
+turningNeutral = setdiff(validPaths,[turningLeft,turningRight]);
+
+velocityNeutral = zeros(size(turningNeutral));
+%D = zeros(size(turningNeutral));
+if ~isempty(turningNeutral)
+    for i = 1:length(turningNeutral)
+        velocityNeutral(i) = velocity(find(validPaths == turningNeutral(i)));
+        %    D(i) = D(find(validPaths == turningNeutral(i)));
+    end
+end
+
 percentageLeft = length(turningLeft) / length(validPaths); 
 percentageRight = length(turningRight) / length(validPaths);
 
+[distLeft, distALeft] = getDistanceTravelled(tLng,pm,turningLeft);
+[distRight, distARight] = getDistanceTravelled(tLng,pm,turningRight);
+
 % save as mat file 
-save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle','pathLength','fractionValidObservationTime','percentageLeft','percentageRight');
+save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle',...
+    'pathLength','fractionValidObservationTime','percentageLeft','percentageRight',...
+    'distLeft','distALeft','distRight','distARight','velocityLeft','velocityRight',...
+    'turningLeft','turningRight','turningNeutral','velocityNeutral','DLeft','DRight');
 
 
 % save all parameters for each trajectory as csv 
