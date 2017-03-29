@@ -1,9 +1,17 @@
 function [] = performBatchMigrationAnalysis(expPath,OVERWRITE)
+% Batch analysis 
 %
+% All tracked experiments found in the given folder are analysed 
 %
+% Input
+%   expPath         The experiment path is recursively searched for 
+%                   analyzed experiments
 %
-%
+% Optional Input
+%   OVERWRITE       Force overwrite of already analyzed experiments    
 % 
+%
+% 3.2017 tb
 
 
 if ~exist('OVERWRITE','var')
@@ -25,13 +33,14 @@ for i=1:nFiles
     exp.detectionParaStored(i) = exist([pathList{i} filesep 'images' filesep 'image_parameters.mat'],'file');
     exp.tracked(i) =  exist([pathList{i} filesep 'results' filesep 'image_tLng.mat'],'file');
     exp.analyzed(i) =  exist([pathList{i} filesep 'results' filesep 'migrationDataValidPaths.mat'],'file');
+    exp.exported(i) =  exist([pathList{i} filesep 'results' filesep 'featureList.csv'],'file');    
 end
 
 fprintf('found %i extracted experiments (image series) \n ',nFiles);
 fprintf(' parameter stored: %i \n ',length(find(exp.detectionParaStored)));  
 fprintf(' already tracked:  %i \n ',length(find(exp.tracked)));
 fprintf(' already analyzed: %i \n',length(find(exp.analyzed)));
-
+fprintf(' already exported: %i \n ',length(find(exp.exported)));
 %%
 
 if OVERWRITE 
