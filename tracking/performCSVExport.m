@@ -43,8 +43,12 @@ csv = exportTidyTrajectories(pm,fm,validPaths);
 fileSepPosition = strfind(experimentPath,filesep);
 experimentName = experimentPath(fileSepPosition(end)+1:end);
 
-csvHeader = {'frameID','cellID','trajectoryID','x position','y position',...
-    'area','brightness','length','compacthness','orientation','experimentID'};
+%csvHeader = {'frameID','cellID','trajectoryID','x position','y position',...
+%    'area','brightness','length','compacthness','orientation','experimentID'};
+
+% use parameter names used in CellProfiler Tracking
+csvHeader = {'ImageNumber','ObjectNumber','TrackObjects_Label','AreaShape_Center_X','AreaShape_Center_Y',...
+    'AreaShape_Area','brightness','AreaShape_MajorAxisLength','AreaShape_Compactness','AreaShape_Orientation/','experimentID'};
 
 % first we write the header
 fid = fopen(csvName,'w');
