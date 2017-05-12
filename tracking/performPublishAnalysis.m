@@ -15,10 +15,6 @@ filename = 'expInfo.mat';
 
 nFiles = size(fileList,2);
 
-radius = 45;
-frameRadius = 3;
-SAVE = 1;
-detection_method = 2;
 
 for i=1:nFiles
     % check if detection file is written

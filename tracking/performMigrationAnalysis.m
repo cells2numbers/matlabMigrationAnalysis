@@ -1,4 +1,4 @@
-function[] = performMigrationAnalysis(expPath,PLOTMORE)
+function[] = performMigrationAnalysis(expPath,PLOTMORE,minPathLength)
 % 
 %
 %
@@ -12,7 +12,7 @@ end
 load([expPath filesep 'results' filesep 'image_tLng.mat']);
 
 % extract valid paths 
-validPaths = getValidPath(pm,'length',20);
+validPaths = getValidPath(pm,'length',minPathLength);
 trajectories = cell(size(validPaths));
 
 for i=1:length(validPaths)
@@ -22,6 +22,7 @@ for i=1:length(validPaths)
     iCentroids = iCentroids - repmat(iCentroids(1,:),size(iCentroids,1),1);
     trajectories{i} = iCentroids;
 end
+
 % plot trajectories 
 figure();hold on;
 for i=1:length(validPaths)

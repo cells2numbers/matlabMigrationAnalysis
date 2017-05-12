@@ -18,6 +18,8 @@ if ~exist('OVERWRITE','var')
     OVERWRITE = 1; 
 end
 
+minPathLength = 0;
+
 filename = 'expInfo.mat';
 [fileList,pathList] = searchFileRec(expPath,filename);
 
@@ -50,7 +52,7 @@ parfor i=1:length(index2analyze)
     %fprintf('---------------------------------------------------\n');
     fprintf('analyzing series %i / %i ',i,length(index2analyze));
     iExp = index2analyze(i);
-    performMigrationAnalysis(pathList{iExp});
+    performMigrationAnalysis(pathList{iExp},1,minPathLength);
     fprintf('  finished!\n');
     %fprintf('---------------------------------------------------\n\n');
 end
