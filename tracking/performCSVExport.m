@@ -47,7 +47,7 @@ experimentName = experimentPath(fileSepPosition(end)+1:end);
 %    'area','brightness','length','compacthness','orientation','experimentID'};
 
 % use parameter names used in CellProfiler Tracking
-csvHeader = {'Metadata_timePoint','ObjectNumber','TrackObjects_Label','Location_Center_X','Location_Center_Y',...
+csvHeader = {'Metadata_timePoint','ObjectNumber','TrackObjects_Label','Location_Center_Y','Location_Center_X',...
     'AreaShape_Area','brightness','AreaShape_MajorAxisLength','AreaShape_Compactness','AreaShape_Orientation/','experimentID'};
 
 % first we write the header
