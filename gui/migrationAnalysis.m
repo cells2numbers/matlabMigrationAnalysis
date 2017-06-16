@@ -185,9 +185,10 @@ function pushbutton_analyse_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 PLOTMORE = 1;
+minPathLength = 20;
 
 expPath = get(handles.pushbutton_load_experiment,'UserData');
-performMigrationAnalysis(expPath,PLOTMORE);
+performMigrationAnalysis(expPath,PLOTMORE,minPathLength);
 
 
 % --- Executes on button press in pushbutton_new_experiment.
