@@ -23,31 +23,35 @@ for i=1:length(validPaths)
     trajectories{i} = iCentroids;
 end
 
-% plot trajectories 
-figure();hold on;
-for i=1:length(validPaths)
-   % all trajectories moving to the 'left' are plotted in red,
-   % all trajectories moving to the 'right' are plotted in black
-   if trajectories{i}(end,2) > 0
-       plot(trajectories{i}(:,2),trajectories{i}(:,1),'k');
-   else
-       plot(trajectories{i}(:,2),trajectories{i}(:,1),'r');
-   end
-    %drawnow
+% plot trajectories
+if PLOTMORE
+    figure();hold on;
+    for i=1:length(validPaths)
+        % all trajectories moving to the 'left' are plotted in red,
+        % all trajectories moving to the 'right' are plotted in black
+        if trajectories{i}(end,2) > 0
+            plot(trajectories{i}(:,2),trajectories{i}(:,1),'k');
+        else
+            plot(trajectories{i}(:,2),trajectories{i}(:,1),'r');
+        end
+        %drawnow
+    end
+    grid on;
+    axis equal
+    title('Trajektorien');
 end
-grid on;
-axis equal
-title('Trajektorien');    
 
 % aangle distribution of the direction of movement 
 trajectoryAngle = zeros(size(validPaths));
 for i=1:length(validPaths)
    trajectoryAngle(i) = atan2(trajectories{i}(end,1),trajectories{i}(end,2));
 end
-figure();
-rose(trajectoryAngle,18)
-title('distribution of trajectories direction')
 
+if PLOTMORE
+    figure();
+    rose(trajectoryAngle,18)
+    title('distribution of trajectories direction')
+end
 %    calculate X_FMI and Y_FMI
 X_FMI = zeros(size(validPaths));
 Y_FMI = zeros(size(validPaths));
@@ -83,7 +87,7 @@ saveName = [expPath filesep 'results' filesep 'migrationDataValidPaths.mat'];
 
 % 
 [fractionValidObservationTime, validObservationTime, totalObservationTime] = getValidObservationTime(pm);
-[turningLeft, turningRight] = performSectorAnalysis(tLng,pm,validPaths,1);
+[turningLeft, turningRight] = performSectorAnalysis(tLng,pm,validPaths,0);
 
 velocityLeft = zeros(size(turningLeft));
 DLeft = zeros(size(turningLeft));
@@ -117,25 +121,119 @@ percentageRight = length(turningRight) / length(validPaths);
 [distRight, distARight] = getDistanceTravelled(tLng,pm,turningRight);
 
 % save as mat file 
-save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle',...
-    'pathLength','fractionValidObservationTime','percentageLeft','percentageRight',...
-    'distLeft','distALeft','distRight','distARight','velocityLeft','velocityRight',...
-    'turningLeft','turningRight','turningNeutral','velocityNeutral','DLeft','DRight');
+%save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle',...
+%    'pathLength','fractionValidObservationTime','percentageLeft','percentageRight',...
+%    'distLeft','distALeft','distRight','distARight','velocityLeft','velocityRight',...
+%    'turningLeft','turningRight','turningNeutral','velocityNeutral','DLeft','DRight');
 
+sector_positive = (trajectoryAngle > (3*pi/4)) + (trajectoryAngle < (-3*pi/4));
+sector_negative = (trajectoryAngle < pi/4) & (trajectoryAngle > -pi/4);
+sector_analysis = sector_positive + 2*sector_negative;
+
+% pixel size = 0.7819
+% frames per minute = 2
+% factor speed = 
+
+pixel_size = 0.7819;
+frames_per_minute = 2;
+% frames are recorded each 30 seconds, i.e. 
+factor_speed = pixel_size * frames_per_minute;
+factor_time = 1/frames_per_minute;
 
 % save all parameters for each trajectory as csv 
 saveNameCSV1 = [expPath filesep 'results' filesep 'migrationDataValidPaths.csv'];
-migrationDataMatrix = [pathLength',velocity',X_FMI',Y_FMI',D',trajectoryAngle'];
-csvHeader1 = {'pathlength','velocity','x-fmi','y-fmi','directionality','angle'};
+migrationDataMatrix = [pathLength' * factor_time,...
+                       velocity' * factor_speed,...
+                       X_FMI',...
+                       Y_FMI',...
+                       D',...
+                       trajectoryAngle',...
+                       sector_analysis'
+                       ];
+                   
+csvHeader1 = {'pathlength in minutes',...
+              'velocity in ?m/minute',...
+              'x-fmi',...
+              'y-fmi',...
+              'directionality',...
+              'angle',...
+              'sector (0 = neutral, 1 = positive, 2 = negative)'
+              };
+          
 csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,csvHeader1);
+
+%%
+% loop over different sectors, 
+%   0 = neutral, 
+%   1 = positive, 
+%   2 = negative
+
+% we remove short trajectories
+
+data = cell(1,5);
+test_file = [expPath filesep 'results' filesep 'migration.xlsx'];
+for value_i = 1:5
+    mean_values = zeros(4,4);
+    
+    all_values = migrationDataMatrix(:,value_i);
+    mean_values(4, 1) = median(all_values);
+    mean_values(4, 2) = mean(all_values);
+    mean_values(4, 3) = std(all_values) / sqrt(length(all_values));
+    mean_values(4, 4) = std(all_values);
+    
+    for index_i =0:2
+        index = find(migrationDataMatrix(:,end) == index_i);
+        values = migrationDataMatrix(index,value_i);
+        mean_values(index_i + 1,1) = median(values);
+        mean_values(index_i + 1,2) = mean(values);
+        mean_values(index_i + 1,3) = std(values) / sqrt(length(values));
+        mean_values(index_i + 1,4) = std(values);
+    end
+    
+    Sector = {'all','positive','negative','neutral'};
+    MEDIAN = mean_values(:,1);
+    MEAN = mean_values(:,2);
+    SEM = mean_values(:,3);
+    SD = mean_values(:,4);
+    T = table(Sector', MEAN, MEDIAN, SEM, SD);
+    writetable(T,test_file, 'sheet',value_i, 'Range','A5');
+    Feature = csvHeader1(value_i);
+    T_with_name = table(Feature);
+    writetable(T_with_name,test_file, 'sheet',value_i, 'Range', 'A1');
+end
+%%
+
 
 % save all parameters describing the complete experiment as separate csv
 saveNameCSV2 = [expPath filesep 'results' filesep 'migrationDataExperiment.csv'];
-migrationDataExperiment = [percentageLeft, percentageRight, fractionValidObservationTime];
-csvHeader2 = {'percentageLeft','percentageRight','fractionValidObservationTime'};
-csvwrite_with_headers(saveNameCSV2,migrationDataExperiment,csvHeader2);
 
-if PLOTMORE
+%migrationDataExperiment = [percentageLeft, percentageRight, fractionValidObservationTime];
+
+migrationDataExperiment2 = [tLng.time_max,...
+                            fractionValidObservationTime,...
+                            size(pm,1),...
+                            length(validPaths),...
+                            length(validPaths) / size(pm,1),...
+                            length(turningLeft),...
+                            length(turningRight),...
+                            length(turningNeutral),...
+                            ];
+                            
+
+%csvHeader2 = {'percentageLeft','percentageRight','fractionValidObservationTime'};
+csvHeader2 = {'frames analyzed',...
+              'VOT',...
+              'tracks',...
+              'valid tracks',...
+              'valid track fraction',...
+              'tracks in positive sector',...
+              'tracks in negative sector',...
+              'tracks in neutral sector'};
+csvwrite_with_headers(saveNameCSV2,migrationDataExperiment2,csvHeader2);
+
+
+
+if 0
     
     %%
     figure();

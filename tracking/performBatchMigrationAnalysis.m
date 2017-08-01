@@ -18,7 +18,7 @@ if ~exist('OVERWRITE','var')
     OVERWRITE = 1; 
 end
 
-minPathLength = 0;
+minPathLength = 20;
 
 filename = 'expInfo.mat';
 [fileList,pathList] = searchFileRec(expPath,filename);
@@ -48,11 +48,11 @@ else
 end
 
 
-parfor i=1:length(index2analyze)
+for i=1:length(index2analyze)
     %fprintf('---------------------------------------------------\n');
     fprintf('analyzing series %i / %i ',i,length(index2analyze));
     iExp = index2analyze(i);
-    performMigrationAnalysis(pathList{iExp},1,minPathLength);
+    performMigrationAnalysis(pathList{iExp},0,minPathLength);
     fprintf('  finished!\n');
     %fprintf('---------------------------------------------------\n\n');
 end
@@ -115,7 +115,7 @@ end
               'perc. turning right','dist left', 'ac. dist left','dist right','ac. dist right','velocity left','velocity right','velocity neutral','DLeft','DRight'};
  
  save([expPath filesep 'migrationData.mat'],'migrationData','fileList','pathList','csvHeader');
- %csvwrite_with_headers([expPath filesep 'migrationData.csv'],migrationData,csvHeader );
+%%csvwrite_with_headers([expPath filesep 'migrationData.csv'],migrationData,csvHeader );
 %%
  % export to csv
  fid = fopen([expPath filesep 'migrationData.csv'],'w');
@@ -123,12 +123,13 @@ end
      fprintf(fid,'%s,',csvHeader{i});
  end
  
+ 
  fprintf(fid,'\n');
  %%
  for i=1:size(migrationData,1)
      [p,n,e] = fileparts(fileList{i});
      filesepPosition = strfind(p,filesep);
      expPathString = p((filesepPosition(end-2)+1):end);
-     fprintf(fid,'%i, %i, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e, %2.4e,%2.4e, %2.4e, %2.4e, %2.4e, %2.4e,  %s \n',migrationData(i,:),expPathString);
+     fprintf(fid,'%i, %i, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f, %2.4f,%2.4f, %2.4f, %2.4f, %2.4f, %2.4f,  %s \n',migrationData(i,:),expPathString);
  end
 

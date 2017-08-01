@@ -1,4 +1,4 @@
-function[turningLeft, turningRight,idLeft,idRight] = performSectorAnalysis(tLng,pm,pathList,PLOT)
+function[turningLeft, turningRight] = performSectorAnalysis(tLng,pm,pathList,PLOT)
 %
 %
 %
@@ -9,9 +9,9 @@ function[turningLeft, turningRight,idLeft,idRight] = performSectorAnalysis(tLng,
 
 %%
 
-if ~exist('PLOT','var')
-    PLOT = 0;
-end
+
+PLOT = 0;
+
 
 trajectories = cell(size(pathList));
 

@@ -40,8 +40,20 @@ for i=1:length(validPaths)
    a(i) = atan2(trajectories{i}(end,1),trajectories{i}(end,2));
 end
 figure();
-rose(a,18)
-title('distribution of trajectories direction')
+
+h = rose(a,20);
+set(h,'linewidth',2)
+
+xlabel_text = sprintf('Angle (in %c)', char(176));
+xlabel(xlabel_text,'FontWeight','bold','FontSize',16);
+ylabel({'Nr. of Trajectories'},'FontWeight','bold','FontSize',16,...
+   'Color',[0 0 1],...
+   'Rotation',90);
+hlines = findall(gcf,'Type','line','LineStyle','-');
+for i = 1:length(hlines)
+   set(hlines(i),'LineWidth',2);
+
+end
 
 %    calculate X_FMI and Y_FMI
 X_FMI = zeros(size(validPaths));
