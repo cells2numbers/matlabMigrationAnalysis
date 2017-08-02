@@ -68,7 +68,7 @@ for i=1:length(validPaths)
     dist = centroids(2:end,:) - centroids(1:(end-1),:);
     dist_accum = sum(sqrt(sum(dist.^2,2)));
     velocity(i) = dist_accum / length(dist);
-    
+    dist_accum_vector(i) = dist_accum;
     dist_euc = norm(centroids(end,:));
     M(i,:) = centroids(end,:);
     X_FMI(i) =  centroids(end,2)/dist_accum;
@@ -135,14 +135,17 @@ sector_analysis = sector_positive + 2*sector_negative;
 % factor speed = 
 
 pixel_size = 0.7819;
-frames_per_minute = 2;
+frames_per_second = 1/30;
 % frames are recorded each 30 seconds, i.e. 
-factor_speed = pixel_size * frames_per_minute;
-factor_time = 1/frames_per_minute;
+factor_speed = pixel_size * frames_per_second;
+factor_time = 1/frames_per_second;
 
 % save all parameters for each trajectory as csv 
-saveNameCSV1 = [expPath filesep 'results' filesep 'migrationDataValidPaths.csv'];
-migrationDataMatrix = [pathLength' * factor_time,...
+saveNameCSV1 = [expPath filesep 'results' filesep ' Migration_Parameters_Valid_Paths.csv'];
+saveNameXLS1 = [expPath filesep 'results' filesep ' Migration_Parameters_Valid_Paths.xls'];
+
+migrationDataMatrix = [dist_accum_vector' * pixel_size, ...
+                       pathLength' * factor_time,...
                        velocity' * factor_speed,...
                        X_FMI',...
                        Y_FMI',...
@@ -151,36 +154,37 @@ migrationDataMatrix = [pathLength' * factor_time,...
                        sector_analysis'
                        ];
                    
-csvHeader1 = {'pathlength in minutes',...
-              'velocity in ?m/minute',...
-              'x-fmi',...
-              'y-fmi',...
+header = {'distance_traveled_in_micrometer_m',...
+              'lifetime_in_seconds',...
+              'velocity_micrometer_seconds',...
+              'x_fmi',...
+              'y_fmi',...
               'directionality',...
               'angle',...
-              'sector (0 = neutral, 1 = positive, 2 = negative)'
+              'sector_0neutral_1positive_2negative'
               };
           
-csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,csvHeader1);
-
+csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,header);
+a = array2table(migrationDataMatrix,'VariableNames',header);
+writetable(a, saveNameXLS1);
 %%
 % loop over different sectors, 
 %   0 = neutral, 
 %   1 = positive, 
 %   2 = negative
 
-% we remove short trajectories
 
 data = cell(1,5);
-test_file = [expPath filesep 'results' filesep 'migration.xlsx'];
+test_file = [expPath filesep 'results' filesep 'Migration_Parameters_Valid_Paths_analyzed.xlsx'];
 for value_i = 1:5
-    mean_values = zeros(4,4);
+    mean_values = zeros(4,5);
     
     all_values = migrationDataMatrix(:,value_i);
     mean_values(4, 1) = median(all_values);
     mean_values(4, 2) = mean(all_values);
     mean_values(4, 3) = std(all_values) / sqrt(length(all_values));
     mean_values(4, 4) = std(all_values);
-    
+    mean_values(4, 5) = length(all_values);
     for index_i =0:2
         index = find(migrationDataMatrix(:,end) == index_i);
         values = migrationDataMatrix(index,value_i);
@@ -188,6 +192,7 @@ for value_i = 1:5
         mean_values(index_i + 1,2) = mean(values);
         mean_values(index_i + 1,3) = std(values) / sqrt(length(values));
         mean_values(index_i + 1,4) = std(values);
+        mean_values(index_i + 1,5) = length(values);
     end
     
     Sector = {'all','positive','negative','neutral'};
@@ -195,9 +200,11 @@ for value_i = 1:5
     MEAN = mean_values(:,2);
     SEM = mean_values(:,3);
     SD = mean_values(:,4);
-    T = table(Sector', MEAN, MEDIAN, SEM, SD);
+    N = mean_values(:,5);
+    N_Fraction = N ./ mean_values(4, 5);
+    T = table(Sector', MEAN, MEDIAN, SEM, SD, N, N_Fraction);
     writetable(T,test_file, 'sheet',value_i, 'Range','A5');
-    Feature = csvHeader1(value_i);
+    Feature = header(value_i);
     T_with_name = table(Feature);
     writetable(T_with_name,test_file, 'sheet',value_i, 'Range', 'A1');
 end
@@ -205,8 +212,8 @@ end
 
 
 % save all parameters describing the complete experiment as separate csv
-saveNameCSV2 = [expPath filesep 'results' filesep 'migrationDataExperiment.csv'];
-
+saveNameCSV2 = [expPath filesep 'results' filesep 'Migration_Metadata.csv'];
+saveNameXLS2 = [expPath filesep 'results' filesep 'Migration_Metadata.xls'];
 %migrationDataExperiment = [percentageLeft, percentageRight, fractionValidObservationTime];
 
 migrationDataExperiment2 = [tLng.time_max,...
@@ -221,16 +228,20 @@ migrationDataExperiment2 = [tLng.time_max,...
                             
 
 %csvHeader2 = {'percentageLeft','percentageRight','fractionValidObservationTime'};
-csvHeader2 = {'frames analyzed',...
+csvHeader2 = {'frames_analyzed',...
               'VOT',...
               'tracks',...
-              'valid tracks',...
-              'valid track fraction',...
-              'tracks in positive sector',...
-              'tracks in negative sector',...
-              'tracks in neutral sector'};
+              'valid_tracks',...
+              'valid_track_fraction',...
+              'tracks_positive_sector',...
+              'tracks_negative_sector',...
+              'tracks_in_neutral_sector'};
 csvwrite_with_headers(saveNameCSV2,migrationDataExperiment2,csvHeader2);
+%csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,header);
+b = array2table(migrationDataExperiment2,'VariableNames',csvHeader2);
 
+
+writetable(b, saveNameXLS2);
 
 
 if 0
@@ -270,6 +281,4 @@ if 0
     boxplot(migrationDataMatrix(:,5))
     title('directionality');
 
-    
-    
 end
