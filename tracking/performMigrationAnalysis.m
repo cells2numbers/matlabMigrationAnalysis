@@ -121,10 +121,10 @@ percentageRight = length(turningRight) / length(validPaths);
 [distRight, distARight] = getDistanceTravelled(tLng,pm,turningRight);
 
 % save as mat file 
-%save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle',...
-%    'pathLength','fractionValidObservationTime','percentageLeft','percentageRight',...
-%    'distLeft','distALeft','distRight','distARight','velocityLeft','velocityRight',...
-%    'turningLeft','turningRight','turningNeutral','velocityNeutral','DLeft','DRight');
+save(saveName,'validPaths','velocity','X_FMI','Y_FMI','FMI','D','M','trajectoryAngle',...
+    'pathLength','fractionValidObservationTime','percentageLeft','percentageRight',...
+    'distLeft','distALeft','distRight','distARight','velocityLeft','velocityRight',...
+    'turningLeft','turningRight','turningNeutral','velocityNeutral','DLeft','DRight');
 
 sector_positive = (trajectoryAngle > (3*pi/4)) + (trajectoryAngle < (-3*pi/4));
 sector_negative = (trajectoryAngle < pi/4) & (trajectoryAngle > -pi/4);
@@ -195,7 +195,7 @@ for value_i = 1:5
         mean_values(index_i + 1,5) = length(values);
     end
     
-    Sector = {'all','positive','negative','neutral'};
+    Sector = {'neutral','positive','negative','all'};
     MEDIAN = mean_values(:,1);
     MEAN = mean_values(:,2);
     SEM = mean_values(:,3);

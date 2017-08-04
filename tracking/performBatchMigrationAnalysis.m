@@ -63,7 +63,7 @@ for i=1:nFiles
     exp.tracked(i) =  exist([pathList{i} filesep 'results' filesep 'image_tLng.mat'],'file');
     exp.analyzed(i) =  exist([pathList{i} filesep 'results' filesep 'migrationDataValidPaths.mat'],'file');
 end
-
+nValidPaths = [];
 if 1
     nPaths = [];
     %%
@@ -104,8 +104,12 @@ if 1
             nPaths(i),nValidPaths(i),nValidPaths(i)/nPaths(i),xfmi(i),yfmi(i),meanVelocity(i),d(i), validObservationTime(i),turnLeft(i), turnRight(i), p((filesepPosition(end-2)+1):end));
     end
 end
-    
- migrationData = [nPaths',nValidPaths',nValidPaths'./nPaths',xfmi',yfmi',...
+
+if isempty(nValidPaths)
+   
+    print('no valid paths')
+end
+migrationData = [nPaths',nValidPaths',nValidPaths'./nPaths',xfmi',yfmi',...
                   meanVelocity',d',validObservationTime',turnLeft',turnRight',...
                   distanceLeft',distanceLeftAccu',distanceRight',distanceRightAccu',meanVelocityLeft',meanVelocityRight',meanVelocityNeutral',meanDLeft',meanDRight'];
               
