@@ -306,7 +306,7 @@ function pushbutton_batch_tracking_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 expPath = uigetdir();
-OVERWRITE = 1;
+OVERWRITE = 0;
 
 if isequal(expPath,0)
     warning('no path selected, aborting');

@@ -39,21 +39,46 @@ a = zeros(size(validPaths));
 for i=1:length(validPaths)
    a(i) = atan2(trajectories{i}(end,1),trajectories{i}(end,2));
 end
+
+
+
 figure();
-
-h = rose(a,20);
-set(h,'linewidth',2)
-
-xlabel_text = sprintf('Angle (in %c)', char(176));
-xlabel(xlabel_text,'FontWeight','bold','FontSize',16);
-ylabel({'Nr. of Trajectories'},'FontWeight','bold','FontSize',16,...
-   'Color',[0 0 1],...
-   'Rotation',90);
-hlines = findall(gcf,'Type','line','LineStyle','-');
-for i = 1:length(hlines)
-   set(hlines(i),'LineWidth',2);
-
+[T,R] = rose(a,20);
+h = polarplot(T,R)
+title({'Anzahl Trajektorien'},'FontWeight','bold','FontSize',16,...
+   'Color',[0 0 1]);
+pax = gca;
+ticklabel = {};
+for tic=0:11  
+    ticklabel{tic+1} = [sprintf('%i%c',tic*30,char(176))];
 end
+
+pax.ThetaAxis.TickLabels = ticklabel;
+
+%pax.FontSize = 14;
+pax.RColor = [0 0 1];
+pax.GridColor = 'black';
+pax.LineWidth = 2;
+pax.RAxis.Label.Rotation = 0;
+pax.RAxisLocation = 80;
+
+%pax.RAxis.Label.String = sprintf('Winkel [%c]', char(176));
+pax.RAxis.Label.String = '\color[rgb]{0,0,0} \bf Winkel [\circ]';
+pax.TitleFontSizeMultiplier = 1.3;
+limits = pax.RAxis.Limits;
+
+pax.RAxis.FontSize = 18;
+
+pax.RAxis.Label.Position = [270  limits(2) * 1.13 0  ];
+pax.RAxis.Color
+
+set(h,'color','b','linewidth',1.5)
+
+%hlines = findall(gcf,'Type','line','LineStyle','-');
+
+%for i = 1:length(hlines)
+%   set(hlines(i),'LineWidth',2);
+%end
 
 %    calculate X_FMI and Y_FMI
 X_FMI = zeros(size(validPaths));
