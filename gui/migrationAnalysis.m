@@ -184,7 +184,7 @@ function pushbutton_analyse_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-PLOTMORE = 0;
+PLOTMORE = 1;
 minPathLength = 20;
 
 expPath = get(handles.pushbutton_load_experiment,'UserData');
