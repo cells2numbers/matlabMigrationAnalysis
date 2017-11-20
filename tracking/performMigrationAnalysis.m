@@ -166,7 +166,14 @@ header = {'distance_traveled_in_micrometer_m',...
           
 csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,header);
 a = array2table(migrationDataMatrix,'VariableNames',header);
-writetable(a, saveNameXLS1);
+
+% get version info
+v = ver('MATLAB');
+matlab_version = str2double(v.Version);
+
+if matlab_version >= 9
+    writetable(a, saveNameXLS1);
+end
 %%
 % loop over different sectors, 
 %   0 = neutral, 
@@ -203,10 +210,14 @@ for value_i = 1:5
     N = mean_values(:,5);
     N_Fraction = N ./ mean_values(4, 5);
     T = table(Sector', MEAN, MEDIAN, SEM, SD, N, N_Fraction);
-    writetable(T,test_file, 'sheet',value_i, 'Range','A5');
+    if matlab_version >= 9
+        writetable(T,test_file, 'sheet',value_i, 'Range','A5');
+    end
     Feature = header(value_i);
     T_with_name = table(Feature);
-    writetable(T_with_name,test_file, 'sheet',value_i, 'Range', 'A1');
+    if matlab_version >= 9
+        writetable(T_with_name,test_file, 'sheet',value_i, 'Range', 'A1');
+    end
 end
 %%
 
@@ -240,9 +251,9 @@ csvwrite_with_headers(saveNameCSV2,migrationDataExperiment2,csvHeader2);
 %csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,header);
 b = array2table(migrationDataExperiment2,'VariableNames',csvHeader2);
 
-
-writetable(b, saveNameXLS2);
-
+if matlab_version >= 9
+    writetable(b, saveNameXLS2);
+end
 
 if 0
     
