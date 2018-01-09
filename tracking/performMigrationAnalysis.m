@@ -4,6 +4,8 @@ function[] = performMigrationAnalysis(expPath,PLOTMORE,minPathLength)
 %
 % 05.2015 Tim Becker 
 
+EXPORT_XLS = 0;
+
 if ~exist('PLOTMORE','var')
     PLOTMORE = 0;
 end
@@ -171,7 +173,7 @@ a = array2table(migrationDataMatrix,'VariableNames',header);
 v = ver('MATLAB');
 matlab_version = str2double(v.Version);
 
-if matlab_version >= 9
+if (matlab_version >= 9) && (EXPORT_XLS)
     writetable(a, saveNameXLS1);
 end
 %%
@@ -182,7 +184,17 @@ end
 
 
 data = cell(1,5);
+
 test_file = [expPath filesep 'results' filesep 'Migration_Parameters_Valid_Paths_analyzed.xlsx'];
+
+csv_names = {
+    [expPath filesep 'results' filesep 'pathlength.csv']
+    [expPath filesep 'results' filesep 'velocity.csv']
+    [expPath filesep 'results' filesep 'xfmi.csv']
+    [expPath filesep 'results' filesep 'yfmi.csv']
+    [expPath filesep 'results' filesep 'directionality.csv']
+    };
+
 for value_i = 1:5
     mean_values = zeros(4,5);
     
@@ -210,14 +222,21 @@ for value_i = 1:5
     N = mean_values(:,5);
     N_Fraction = N ./ mean_values(4, 5);
     T = table(Sector', MEAN, MEDIAN, SEM, SD, N, N_Fraction);
-    if matlab_version >= 9
+    
+    if (matlab_version >= 9) && (EXPORT_XLS)
         writetable(T,test_file, 'sheet',value_i, 'Range','A5');
     end
+    writetable(T,csv_names{value_i});
+    
     Feature = header(value_i);
     T_with_name = table(Feature);
-    if matlab_version >= 9
+    
+    if (matlab_version >= 9) && (EXPORT_XLS)
         writetable(T_with_name,test_file, 'sheet',value_i, 'Range', 'A1');
     end
+    
+    
+    
 end
 %%
 
@@ -249,9 +268,10 @@ csvHeader2 = {'frames_analyzed',...
               'tracks_in_neutral_sector'};
 csvwrite_with_headers(saveNameCSV2,migrationDataExperiment2,csvHeader2);
 %csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,header);
+
 b = array2table(migrationDataExperiment2,'VariableNames',csvHeader2);
 
-if matlab_version >= 9
+if (matlab_version >= 9) && (EXPORT_XLS)
     writetable(b, saveNameXLS2);
 end
 
