@@ -3,15 +3,12 @@ function[] = performMigrationAnalysis(expPath,PLOTMORE,minPathLength)
 
 EXPORT_XLS = 0;
 
-<<<<<<< HEAD
 pixel_size = 0.7819;
 frames_per_second = 1/30;
 
 factor_speed = pixel_size * frames_per_second;
 factor_time = 1/frames_per_second;
-
-=======
->>>>>>> 10ceb5debd390d3e75d37d5623efe84af89fb4ec
+ 
 if ~exist('PLOTMORE','var')
     PLOTMORE = 0;
 end
@@ -186,19 +183,12 @@ data = cell(1,5);
 test_file = [expPath filesep 'results' filesep 'Migration_Parameters_Valid_Paths_analyzed.xlsx'];
 
 csv_names = {
-<<<<<<< HEAD
+
     [expPath filesep 'results' filesep 'distance_traveled.csv']
     [expPath filesep 'results' filesep 'lifetime.csv']
     [expPath filesep 'results' filesep 'velocity.csv']
     [expPath filesep 'results' filesep 'xfmi.csv']
     [expPath filesep 'results' filesep 'yfmi.csv']
-=======
-    [expPath filesep 'results' filesep 'pathlength.csv']
-    [expPath filesep 'results' filesep 'velocity.csv']
-    [expPath filesep 'results' filesep 'xfmi.csv']
-    [expPath filesep 'results' filesep 'yfmi.csv']
-    [expPath filesep 'results' filesep 'directionality.csv']
->>>>>>> 10ceb5debd390d3e75d37d5623efe84af89fb4ec
     };
 
 for value_i = 1:5
@@ -274,15 +264,10 @@ csvHeader2 = {'frames_analyzed',...
               'tracks_in_neutral_sector'};
 csvwrite_with_headers(saveNameCSV2,migrationDataExperiment2,csvHeader2);
 %csvwrite_with_headers(saveNameCSV1,migrationDataMatrix,header);
-<<<<<<< HEAD
+
 
 b = array2table(migrationDataExperiment2,'VariableNames',csvHeader2);
 
-=======
-
-b = array2table(migrationDataExperiment2,'VariableNames',csvHeader2);
-
->>>>>>> 10ceb5debd390d3e75d37d5623efe84af89fb4ec
 if (matlab_version >= 9) && (EXPORT_XLS)
     writetable(b, saveNameXLS2);
 end
