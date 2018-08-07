@@ -46,12 +46,20 @@ else
     
     parfor i=1:length(index2track)
         fprintf('---------------------------------------------------\n');
-        fprintf('tracking image series %i of the last missing %i \n',i,length(index2track));
+        fprintf('tracking image series %i of the last missing %i ',i,length(index2track));
+        
         iExp = index2track(i);
-        performTracking(pathList{iExp},'image_001.png',...
-            detection_method,radius,frameRadius,SAVE);
-        fprintf('finished image series %i of the last missing %i \n',i,length(index2track));
-        fprintf('---------------------------------------------------\n\n');
+        fprintf(' (folder %s \n',pathList{iExp});
+        try
+            performTracking(pathList{iExp},'image_0001.png',...
+                detection_method,radius,frameRadius,SAVE);
+            fprintf('finished image series %i of the last missing %i \n',i,length(index2track));
+            fprintf('---------------------------------------------------\n\n');
+        catch 
+             fprintf('---------------------------------------------------');
+             fprintf(' ERROR folder %s  failed \n',pathList{iExp});
+             fprintf('---------------------------------------------------\n\n');
+        end 
     end
 end
 
