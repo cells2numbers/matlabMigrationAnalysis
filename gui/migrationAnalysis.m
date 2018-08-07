@@ -85,7 +85,12 @@ function pushbutton_detection_parameter_Callback(hObject, eventdata, handles)
 experiment_path = get(handles.pushbutton_load_experiment,'UserData');
 cd([experiment_path filesep 'images']);
 
-I = imread([experiment_path filesep 'images' filesep 'image_001.png']);
+if (exist([experiment_path filesep 'images' filesep 'image_0001.png'],'file'))     
+    I = imread([experiment_path filesep 'images' filesep 'image_0001.png']);
+
+elseif (exist([experiment_path filesep 'images' filesep 'image_0001.png'],'file'))     
+    I = imread([experiment_path filesep 'images' filesep 'image_0001.png']);   
+end
 % we use an old GUI to select appropiate parameters for image segmentation
 
 detection_method =  get(handles.popupmenu_detection_parameter,'Value');
@@ -93,7 +98,7 @@ detection_method =  get(handles.popupmenu_detection_parameter,'Value');
 switch detection_method
     
     case 1
-        h = findCellsParaGUI(I,experiment_path,'image_001.png');
+        h = findCellsParaGUI(I,experiment_path,'image_0001.png');
         waitfor(h);
     case 2
         h = findCellsRFParaGUI(I,experiment_path);
@@ -117,7 +122,7 @@ frameRadius = 3;
 experiment_path = get(handles.pushbutton_load_experiment,'UserData');
 detection_method =  get(handles.popupmenu_detection_parameter,'Value');
 
-performTracking(experiment_path,'image_001.png',...
+performTracking(experiment_path,'image_0001.png',...
     detection_method,radius,frameRadius,1);
 
 % update figure (activate Analyse push buttobn 
@@ -306,7 +311,7 @@ function pushbutton_batch_tracking_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 expPath = uigetdir();
-OVERWRITE = 1;
+OVERWRITE = 0;
 
 if isequal(expPath,0)
     warning('no path selected, aborting');
@@ -320,7 +325,7 @@ function pushbutton_batch_analyse_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-OVERWRITE = 1;
+OVERWRITE = 0;
 
 expPath = uigetdir();
 if isequal(expPath,0)
