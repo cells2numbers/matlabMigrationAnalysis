@@ -138,8 +138,8 @@ sector_analysis = sector_positive + 2*sector_negative;
 
 
 % save all parameters for each trajectory as csv 
-saveNameCSV1 = [expPath filesep 'results' filesep ' Migration_Parameters_Valid_Paths.csv'];
-saveNameXLS1 = [expPath filesep 'results' filesep ' Migration_Parameters_Valid_Paths.xls'];
+saveNameCSV1 = [expPath filesep 'results' filesep 'Migration_Parameters_Valid_Paths.csv'];
+saveNameXLS1 = [expPath filesep 'results' filesep 'Migration_Parameters_Valid_Paths.xls'];
 
 migrationDataMatrix = [dist_accum_vector' * pixel_size, ...
                        pathLength' * factor_time,...
