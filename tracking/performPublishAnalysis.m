@@ -21,14 +21,16 @@ for i=1:nFiles
     exp.detectionParaStored(i) = exist([pathList{i} filesep 'images' filesep 'image_parameters.mat'],'file');
     exp.tracked(i) =  exist([pathList{i} filesep 'results' filesep 'image_tLng.mat'],'file');
     exp.analyzed(i) =  exist([pathList{i} filesep 'results' filesep 'migrationDataValidPaths.mat'],'file');
+    exp.published(i) = exist([pathList{i} filesep 'results' filesep 'publishAnalysis_01.png'],'file');
 end
 
 fprintf('found %i extracted experiments (image series) \n ',nFiles);
 fprintf(' parameter stored: %i \n ',length(find(exp.detectionParaStored)));  
 fprintf(' already tracked:  %i \n ',length(find(exp.tracked)));
-fprintf(' already analyzed: %i \n',length(find(exp.analyzed)));
+fprintf(' already analyzed: %i \n ',length(find(exp.analyzed)));
+fprintf(' already published: %i \n ',length(find(exp.published))); 
 
-index2publish = find(exp.analyzed);
+index2publish = find(~exp.published);
 
 for i=1:length(index2publish)
     fprintf('---------------------------------------------------\n');
